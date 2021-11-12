@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Node structure of a memory efficient doubly linked list
 struct node {
     int data;
-    struct node* npx; /* XOR of next and previous node */
+    struct node* npx;
 };
 typedef struct node* NODE;
 
@@ -33,13 +32,26 @@ void deleteNODE(struct node **head_ref, int data){
         printf("The list is empty!! ");
         return;
     }
+    if(curr->data==data){
+        next = XOR(prev, curr->npx);
+        temp = XOR(curr, next->npx);
+        next->npx = XOR(prev, temp);
+        printf("\nThe data deleted is: %d",curr->data);
+        free(curr);
+        *head_ref = next;
+        return;
+    }
     while (curr != NULL) {
         if(curr->data==data){
             temp = XOR(prev->npx, curr);
 
             next = XOR(prev, curr->npx);
             prev->npx = XOR(temp,next);
-
+            if(next==NULL){
+                printf("\nThe data deleted is : %d",curr->data);
+                free(curr);
+                return;
+            }
             temp = XOR(next->npx, curr);
             next->npx = XOR(prev,temp);
 
@@ -49,12 +61,11 @@ void deleteNODE(struct node **head_ref, int data){
             prev = temp;
             return;
         }
-        printf("%d ", curr->data);
         next = XOR(prev, curr->npx);
         prev = curr;
         curr = next;
     }
-
+    printf("\nThe element was not found!!");
 }
 
 void printList(struct node *head) {
@@ -80,10 +91,9 @@ int main() {
     insert(&head, 20);
     insert(&head, 30);
     insert(&head, 40);
-
-    // print the created list
     printList(head);
     deleteNODE(&head,40);
+    deleteNODE(&head,10);
     printList(head);
     return (0);
 }
